@@ -2,7 +2,7 @@
 
 KinD is a solution that allows to quickly create local Kubernetes clusters, ideal for development or testing tasks. However, once these clusters are created, KinD does not have built-in features to modify the cluster configuration by adding or removing nodes, whether they are control-planes or workers, and the entire cluster would need to be regenerated from scratch.
 
-KindScaler comes to facilitate this task. After dissecting how KinD creates and adds different nodes and roles to the cluster, this bash script has been created that allows adding both workers and control planes.
+KindScaler comes to facilitate this task. After dissecting how KinD creates and adds different nodes and roles to the cluster, this bash script has been created and allows to add both workers and control planes.
 
 # How-to
 
