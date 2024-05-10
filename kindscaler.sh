@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euxo pipefail
 
 # Check for required commands
 if ! command -v kind &> /dev/null; then
