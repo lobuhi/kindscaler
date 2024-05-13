@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euxo pipefail
 
 # Check for required commands
 if ! command -v kind &> /dev/null; then
@@ -76,7 +77,7 @@ for i in $(seq $start_index $end_index); do
         --security-opt seccomp=unconfined --security-opt apparmor=unconfined \
         --tmpfs /tmp --tmpfs /run --volume /var \
         --volume /lib/modules:/lib/modules:ro -e KIND_EXPERIMENTAL_CONTAINERD_SNAPSHOTTER \
-        --detach --tty --label io.x-k8s.kind.cluster=kind --net kind \
+        --detach --tty --label io.x-k8s.kind.cluster=$CLUSTER_NAME --net kind \
         --restart=on-failure:1 --init=false $IMAGE > /dev/null 2>&1
         NEW_IP=$(docker inspect $CLUSTER_NAME-$ROLE$i | grep IPAddress | tail -1 | cut -d "\"" -f 4)
         sed -i -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
@@ -95,7 +96,7 @@ for i in $(seq $start_index $end_index); do
         --security-opt seccomp=unconfined --publish=127.0.0.1:$PORT:6443/TCP \
         --security-opt apparmor=unconfined --tmpfs /tmp --tmpfs /run --volume /var \
         --volume /lib/modules:/lib/modules:ro -e KIND_EXPERIMENTAL_CONTAINERD_SNAPSHOTTER \
-        --detach --tty --label io.x-k8s.kind.cluster=kind --net kind \
+        --detach --tty --label io.x-k8s.kind.cluster=$CLUSTER_NAME --net kind \
         --restart=on-failure:1 --init=false $IMAGE > /dev/null 2>&1
         NEW_IP=$(docker inspect $CLUSTER_NAME-$ROLE$i | grep IPAddress | tail -1 | cut -d "\"" -f 4)
         sed -i -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
