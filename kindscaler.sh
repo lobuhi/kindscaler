@@ -62,7 +62,13 @@ for i in $(seq $start_index $end_index); do
     docker cp $CONTAINER_NAME:/kind/kubeadm.conf kubeadm-$i.conf > /dev/null 2>&1
 
     # Replace the container role name with specific node name in the kubeadm file
-    sed -i "s/$CONTAINER_NAME$/$CONTAINER_NAME$i/g" "./kubeadm-$i.conf"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # MacOS
+        sed -i '' "s/$CONTAINER_NAME$/$CONTAINER_NAME$i/g" "./kubeadm-$i.conf"
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux
+        sed -i "s/$CONTAINER_NAME$/$CONTAINER_NAME$i/g" "./kubeadm-$i.conf"
+    fi
 
     # Update IP addresses
     # Assume the file contains parameters 'advertiseAddress' and 'node-ip' with typical IP values
@@ -80,7 +86,13 @@ for i in $(seq $start_index $end_index); do
         --detach --tty --label io.x-k8s.kind.cluster=$CLUSTER_NAME --net kind \
         --restart=on-failure:1 --init=false $IMAGE > /dev/null 2>&1
         NEW_IP=$(docker inspect $CLUSTER_NAME-$ROLE$i | grep IPAddress | tail -1 | cut -d "\"" -f 4)
-        sed -i -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # MacOS
+            sed -i '' -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Linux
+            sed -i -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
+        fi
         sleep 5
         docker cp kubeadm-$i.conf $CLUSTER_NAME-$ROLE$i:/kind/kubeadm.conf > /dev/null 2>&1
         docker exec --privileged $CLUSTER_NAME-$ROLE$i kubeadm join --config /kind/kubeadm.conf --skip-phases=preflight --v=6 > /dev/null 2>&1
@@ -99,7 +111,13 @@ for i in $(seq $start_index $end_index); do
         --detach --tty --label io.x-k8s.kind.cluster=$CLUSTER_NAME --net kind \
         --restart=on-failure:1 --init=false $IMAGE > /dev/null 2>&1
         NEW_IP=$(docker inspect $CLUSTER_NAME-$ROLE$i | grep IPAddress | tail -1 | cut -d "\"" -f 4)
-        sed -i -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # MacOS
+            sed -i '' -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Linux
+            sed -i -r "s/$ORIGINAL_IP/$NEW_IP/g" "./kubeadm-$i.conf"
+        fi
         sleep 10
         docker exec --privileged $CLUSTER_NAME-$ROLE$i mkdir /etc/kubernetes/pki/
         docker exec --privileged $CLUSTER_NAME-$ROLE$i mkdir /etc/kubernetes/pki/etcd
